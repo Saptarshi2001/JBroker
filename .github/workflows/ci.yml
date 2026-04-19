@@ -39,7 +39,7 @@ jobs:
             
             - name: Push to ghcr.io
               run: |
-                docker tag jbroker-server:latest ghcr.io/${{ github.repository }}:latest
+                docker tag jbroker-server:latest ghcr.io/saptarshi2001/jbroker:latest
                 docker push ghcr.io/saptarshi2001/jbroker:latest
             
             - name: Start container
