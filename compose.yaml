@@ -5,5 +5,5 @@ services:
     ports:
       - "8001:4222"  
     restart: always
-    env:
+    environment:
       -./application.properties
