@@ -6,7 +6,7 @@ RUN mvn dependency:go-offline
 COPY src ./src
 RUN mvn clean package
 
-FROM openjdk:21-jre-alpine
+FROM eclipse-temurin:21-jre-alpine
 WORKDIR /jbroker
 COPY --from=builder /app/target/*.jar app.jar
 
