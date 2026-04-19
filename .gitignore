@@ -12,7 +12,7 @@ target/
 .settings
 .springBeans
 .sts4-cache
-
+.jqwik-database
 ### IntelliJ IDEA ###
 .idea
 *.iws
@@ -36,6 +36,8 @@ build/
 *.jar
 *.war
 *.ear
+TEST_EXECUTION_RESULTS.md
+DESIGN_FLAWS_AND_TEST_SCENARIOS
 target/
 build/
 out/

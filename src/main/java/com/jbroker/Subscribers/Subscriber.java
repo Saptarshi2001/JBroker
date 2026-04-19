@@ -2,8 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.jbroker;
-
+package com.jbroker.Subscribers;
+import com.jbroker.Topic.Topic;
+import com.jbroker.Clients.Client;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,13 +15,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
  *
  * @author SAPTARSHI DUTTA
  */
-class Subscriber {
+public class Subscriber {
 
     private List<Topic> lst = new CopyOnWriteArrayList<>();
 
     private Map<Integer, Topic> mp = new ConcurrentHashMap<>();
 
-    Subscriber(Map<Integer, Topic> mp, int subid, String topicname, List<Topic> lst) {
+    public Subscriber(Map<Integer, Topic> mp, int subid, String topicname, List<Topic> lst) {
         this.lst = lst;
         this.mp = mp;
     }

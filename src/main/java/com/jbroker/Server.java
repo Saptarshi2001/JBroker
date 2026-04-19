@@ -1,6 +1,8 @@
 
 package com.jbroker;
 
+import com.jbroker.ThreadPools.ThreadPool;
+import com.jbroker.Messages.Message;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -12,7 +14,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+import com.jbroker.ProtocolParser.Parser;
+import com.jbroker.Clients.Client;
+import com.jbroker.Topic.Topic;
+import com.jbroker.Routers.Router;
 
 public class Server {
     
@@ -20,7 +25,7 @@ public class Server {
     private int serverport;
     private String host;
     private ThreadPool pool;
-    private ProtocolParser parser;
+    private Parser parser;
     private List<Topic> lst= new CopyOnWriteArrayList<>();
     private Map<Integer,Topic>mp= new ConcurrentHashMap<>();;
     private static final Logger logger = Logger.getLogger("server.log");
@@ -61,7 +66,7 @@ public class Server {
             router.sendClient();
            
             pool.execute(()->{
-                new ProtocolParser(mp,lst).parse(clientsocket,client);
+                new Parser(mp,lst).parse(clientsocket,client);
             });
         }
         }catch(IOException ex)

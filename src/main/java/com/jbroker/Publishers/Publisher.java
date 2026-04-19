@@ -1,16 +1,12 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-package com.jbroker;
 
+package com.jbroker.Publishers;
+import com.jbroker.Topic.Topic;
+import com.jbroker.Clients.Client;
+import com.jbroker.Messages.Message;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import com.jbroker.Routers.Router;
 
-/**
- *
- * @author SAPTARSHI DUTTA
- */
 public class Publisher {
     
     private List<Topic> lst= new CopyOnWriteArrayList<>();;
@@ -19,7 +15,7 @@ public class Publisher {
         this.lst=lst;
     }
 
-    String publish(String publishtopicname, Message msg) 
+    public String publish(String publishtopicname, Message msg) 
     {
         String errmsg=null;
         String msgdesc=msg.getMessage();

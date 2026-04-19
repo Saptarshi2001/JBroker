@@ -1,0 +1,14 @@
+FROM openjdk:21-alpine AS builder
+RUN apk add --no-cache maven
+WORKDIR /app
+COPY pom.xml .
+RUN mvn dependency:go-offline
+COPY src ./src
+RUN mvn clean package
+
+FROM openjdk:21-jre-alpine
+WORKDIR /jbroker
+COPY --from=builder /app/target/*.jar app.jar
+
+EXPOSE 4222
+CMD ["mvn", "exec:java", "-Dexec.mainClass=com.jbroker.JbrokerApplication"]

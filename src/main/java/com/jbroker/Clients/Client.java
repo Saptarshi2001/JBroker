@@ -2,7 +2,8 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.jbroker;
+package com.jbroker.Clients
+        ;
 
 import java.net.Socket;
 import java.util.List;
@@ -12,14 +13,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
  *
  * @author SAPTARSHI DUTTA
  */
-class Client {
+public class Client {
 
     String clientaddr;
     int clientport;
     Socket socket;
     List<String> lst = new CopyOnWriteArrayList<>();
     //Message msg;
-    Client(String addr, int port, Socket clientsocket) 
+    public Client(String addr, int port, Socket clientsocket) 
     {
         this.clientaddr=addr;
         this.clientport=port;

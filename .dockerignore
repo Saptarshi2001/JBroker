@@ -1,0 +1,27 @@
+# Git
+.git
+.gitignore
+
+# Build outputs
+target/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Maven
+.mvn/
+mvnw
+mvnw.cmd
+
+# Logs
+log/
+*.log
+
+# Database
+.jqwik-database
+
+# Documentation
+DESIGN_FLAWS_AND_TEST_SCENARIOS.md TEST_EXECUTION_RESULTS
+

@@ -1,13 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package com.jbroker;
 
-/**
- *
- * @author SAPTARSHI DUTTA
- */
+
+import com.jbroker.Subscribers.Subscriber;
 import net.jqwik.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,6 +10,8 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import net.jqwik.api.constraints.IntRange;
+import com.jbroker.Topic.Topic;
+import com.jbroker.Clients.Client;
 
 class PropertyTesting {
 

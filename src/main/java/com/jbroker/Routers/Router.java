@@ -2,8 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.jbroker;
-
+package com.jbroker.Routers;
+import com.jbroker.Clients.Client;
+import com.jbroker.Messages.Message;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -16,7 +17,7 @@ import java.util.logging.Logger;
  */
 public class Router {
     
-    private Message msg;
+    private final Message msg;
     //Client client;
     private static final Logger logger = Logger.getLogger("router.log");
     public Router(Message msg) 
@@ -37,7 +38,7 @@ public class Router {
         {
             System.out.println("IOException occured!!!");
             logger.info(ex.getMessage());
-            return;
+            
         }
     }
     
@@ -53,12 +54,12 @@ public class Router {
         {
             System.out.println("IOException occured!!!");
             logger.info(ex.getMessage());
-            return;
+            
         }catch(ArrayIndexOutOfBoundsException ex)
         {
            System.out.println("ArrayIndexOutOfBoundsException occured!!!");
             logger.info(ex.getMessage());
-            return; 
+        
         }
         
     }

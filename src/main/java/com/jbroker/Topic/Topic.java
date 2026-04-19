@@ -1,6 +1,6 @@
 
-package com.jbroker;
-
+package com.jbroker.Topic;
+import com.jbroker.Clients.Client;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.List;
@@ -64,7 +64,7 @@ public class Topic
         clntmap.put(subid, client);
     }
 
-    void removeClient(Client client) {
+    public void removeClient(Client client) {
         list.remove(client);
     }
 }

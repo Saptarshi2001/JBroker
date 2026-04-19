@@ -10,7 +10,8 @@ import org.junit.jupiter.api.Test;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-
+import com.jbroker.Topic.Topic;
+import com.jbroker.ProtocolParser.Parser;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestParser {
@@ -18,13 +19,13 @@ public class TestParser {
 
 Map<Integer, Topic> mp;
 List<Topic> lst;
-ProtocolParser parser;
+Parser parser;
 
 @BeforeEach
 void setup() {
     mp = new ConcurrentHashMap<>();
     lst = new CopyOnWriteArrayList<>();
-    parser = new ProtocolParser(mp, lst);
+    parser = new Parser(mp, lst);
 }
 
 // -------- CONNECT --------

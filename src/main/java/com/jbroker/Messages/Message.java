@@ -1,6 +1,6 @@
-package com.jbroker;
+package com.jbroker.Messages;
 
-
+import com.jbroker.Clients.Client;
 
 
 public class Message implements SendMessage{

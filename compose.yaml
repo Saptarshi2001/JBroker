@@ -1,0 +1,9 @@
+services:
+  server:
+    build:
+       context: .
+    ports:
+      - "8001:4222"  
+    restart: always
+    env:
+      -./application.properties

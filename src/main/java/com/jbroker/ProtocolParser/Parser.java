@@ -1,6 +1,7 @@
 
-package com.jbroker;
-
+package com.jbroker.ProtocolParser;
+import com.jbroker.Topic.Topic;
+import com.jbroker.Messages.Message;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -8,9 +9,12 @@ import java.net.Socket;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import com.jbroker.Routers.Router;
+import com.jbroker.Clients.Client;
+import com.jbroker.Subscribers.Subscriber;
+import com.jbroker.Publishers.Publisher;
 
-
-class ProtocolParser {
+public class Parser {
 
     private Map<Integer,Topic> mp;
     private List<Topic> lst;
@@ -19,14 +23,14 @@ class ProtocolParser {
     boolean connectflg=false;
     Message publishmsg;
     String publishtopicname;
-    ProtocolParser(Map<Integer, Topic> mp, List<Topic> lst) 
+    public Parser(Map<Integer, Topic> mp, List<Topic> lst) 
     {
         this.mp=mp;
         this.lst=lst;
     }
     
     
-    void parse(Socket clientsocket, Client client)
+    public void parse(Socket clientsocket, Client client)
     {
         try{
         BufferedReader input=new BufferedReader(new InputStreamReader(clientsocket.getInputStream()));
@@ -144,7 +148,7 @@ class ProtocolParser {
         
     }
     
-    boolean validate(String msg)
+    public boolean validate(String msg)
     {
         try{
         boolean valid=false;
