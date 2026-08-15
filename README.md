@@ -1,7 +1,6 @@
 # JBroker
 
-JBroker is a small message broker that follows the Nats protocol, The repository also
-contains an asynchronous 
+JBroker is a small message broker that follows the Nats protocol.
 
 > JBroker is currently intended for learning, local experiments, and controlled
 > tests. It does not provide persistence, acknowledgements, authentication,
