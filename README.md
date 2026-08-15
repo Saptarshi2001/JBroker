@@ -1,280 +1,186 @@
-# jbroker
+# JBroker
 
-A lightweight, TCP-based message broker written in Java that implements a simple publish-subscribe (pub/sub) messaging pattern. This project serves as both a functional message broker for basic messaging needs.
+JBroker is a small message broker that follows the Nats protocol, The repository also
+contains an asynchronous 
 
-## Features
+> JBroker is currently intended for learning, local experiments, and controlled
+> tests. It does not provide persistence, acknowledgements, authentication,
+> replay, clustering, or production-grade connection handling.
 
-- **Simple TCP Protocol**: Easy-to-understand text-based protocol for client communication
-- **Publish-Subscribe Pattern**: Support for multiple subscribers to receive messages from topics
-- **Topic Management**: Dynamic topic creation and management
-- **Multi-threaded Architecture**: Thread pool for handling concurrent client connections
-- **Message Routing**: Efficient message distribution to subscribed clients
-- **Connection Management**: Client connection handling with validation
+## Workflow
 
-## Protocol Commands
 
-The broker supports the following commands:
+### 1. Start the broker
 
-### Connect
-Establishes a connection to the broker.
+- For running the broker as a container directly,here are the steps you should follow.
+
+```powershell
+docker pull ghcr.io/saptarshi2001/jbroker:latest
+
+docker run -d --name jbroker -p 4222:4222 ghcr.io/saptarshi2001/jbroker:latest
 ```
-Connect {}
-```
-**Response**: `+OK` on successful connection
 
-### Subscribe (Sub)
-Subscribes a client to a topic with a unique subscriber ID.
-```
-Sub [topic_name] [subscriber_id]
-```
-**Response**: `Subscribed` on success, error message on failure
+Wait for `System started`. The checked-in configuration uses TCP port `4222`.
 
-### Publish (Pub)
-Publishes a message to a topic. The message content is sent on the next line.
-```
-Pub [topic_name] [message_length]
-[message_content]
-```
-**Response**: Message delivered to all subscribers, or `No topic found` if topic doesn't exist
-
-### Unsubscribe (Unsub)
-Unsubscribes a client from a topic using their subscriber ID.
-```
-Unsub [subscriber_id]
-```
-**Response**: `Unsubbed` on success, error message on failure
-
-## Getting Started
-
-### Prerequisites
-
-- Java 21 or higher
-- Maven 3.6 or higher
-
-### Installation
-
-1. Clone the repository:
-```bash
-git clone <repository-url>
+- For running the source directly.
+```powershell
+git clone https://github.com/Saptarshi2001/JBroker.git
 cd jbroker
-```
 
-2. Build the project:
+mvn test
+docker build -t jbroker:local .
+docker run -d --name jbroker -p 4222:4222 jbroker:local
+```
+On macOS/Linux, ./mvnw test can replace mvn test.
+
+### 2. Connect a subscriber
+
+Open a TCP client such as netcat:
+
 ```bash
-mvn clean package
+nc 127.0.0.1 4222
 ```
 
-### Running the Broker
+The broker sends a six-line banner, including a final blank line. Then enter:
 
-#### Using Maven
-```bash
-mvn exec:java -Dexec.mainClass="com.jbroker.JbrokerApplication"
+```text
+Connect {}
+Sub demo 1
 ```
 
-#### Using Java directly
-```bash
-java -cp target/classes com.jbroker.JbrokerApplication
+The responses are:
+
+```text
++OK
+Subscribed
 ```
 
-### Configuration
+### 3. Publish from another connection
 
-The broker can be configured via `src/main/resources/application.properties`:
+Open a second TCP client, consume its banner, and enter:
+
+```text
+Connect {}
+Pub demo 5
+hello
+```
+
+The subscriber receives `hello`. The publisher receives no publish
+acknowledgement.
+
+### 4. Unsubscribe
+
+On the subscriber connection:
+
+```text
+Unsub 1
+```
+
+The response is `Unsubbed`. Close both TCP connections and stop the broker with
+`Ctrl+C`.
+
+### For using the python sdks use this guide - [Python client SDK](sdks/python/README.md).
+## How-to guides
+
+### Build and test
+
+```powershell
+mvn clean test
+docker build -t jbroker:local .
+```
+Execute the test with
+```powershell
+docker run -d --name jbroker -p 4222:4222 jbroker:local
+```
+The tests use port the `4222`.
+
+### Configure the broker
+
+Configuration is loaded from
+`src/main/resources/application.properties`:
 
 ```properties
-server.address=127.0.0.1
+server.address=0.0.0.0
 server.port=4222
 ```
 
-Or via environment variables:
-- `SERVER_ADDRESS` - Bind address (default: 127.0.0.1)
-- `SERVER_PORT` - Bind port (default: 4222)
+`SERVER_ADDRESS` and `SERVER_PORT` are fallbacks only when their corresponding
+classpath properties are absent. Because both properties are checked in,
+environment variables alone do not override them.
 
-Example with custom port:
-```bash
-export SERVER_PORT=4333
-java -cp target/classes com.jbroker.JbrokerApplication
-```
 
-## Usage Examples
 
-### Basic Client Communication
+### Common failures that might occur when you are using the broker
 
-1. **Connect to broker:**
-```
-Connect {}
-```
-Response: `+OK`
+- **Address already in use:** stop the process occupying port `4222` before
+  starting the broker or its integration tests.
+- **Connection refused:** confirm `System started` appears and that the client
+  uses the configured port.
+- **Client hangs after connecting:** consume all six banner lines, terminate
+  commands with a newline, and flush the client writer.
+- **Message not delivered:** create the topic with `Sub` before publishing,
+  keep the subscriber connected, and use a whitespace-free, single-line body.
+- **Fifth connection appears idle:** four long-lived worker tasks process
+  connections; later connections wait in a queue until a worker becomes free.
 
-2. **Subscribe to a topic:**
-```
-Sub news 101
-```
-Response: `Subscribed`
 
-3. **Publish a message:**
-```
-Pub news 11
-Breaking news
-```
-Response: All subscribers receive "Breaking news"
+## Reference
 
-4. **Unsubscribe:**
-```
-Unsub 101
-```
-Response: `Unsubbed`
+### Wire protocol
 
-### Multiple Subscribers
+The protocol is case-sensitive, newline-delimited TCP text. Use ASCII for
+commands because the server uses the JVM platform-default character set.
 
-Multiple clients can subscribe to the same topic and receive all published messages:
+| Command | Syntax | Success/result |
+| --- | --- | --- |
+| Connect | `Connect {}` | `+OK` |
+| Subscribe | `Sub <topic> <subscriber-id>` | `Subscribed` |
+| Publish | `Pub <topic> <length>` followed by a body line | Body sent to current subscribers 
+| Unsubscribe | `Unsub <subscriber-id>` | `Unsubbed` |
 
-**Client 1:**
-```
-Connect {}
-Sub sports 201
-```
+Rules:
 
-**Client 2:**
-```
-Connect {}
-Sub sports 202
-```
+- subscribe topics accept letters, digits, `.`, and `*`;
+- publish topics accept letters, digits, and `.`;
+- subscriber IDs are globally unique within the running broker;
+- topic matching is exact and case-sensitive; `*` is not a wildcard;
+- topics are created by subscribing, not publishing;
 
-**Publisher:**
-```
-Connect {}
-Pub sports 9
-Game starts
-```
 
-Both clients 201 and 202 will receive "Game starts".
+Common responses:
 
-## Architecture
+| Condition | Response |
+| --- | --- |
+| Subscribe or publish before handshake | `First use Connect {}` |
+| Duplicate subscriber ID | `Id already present` |
+| Unknown unsubscribe ID | `Subscription not found` |
+| Invalid connect | `Wrong Connect !!! Please type Connect{}` |
+| Invalid subscribe | `Invalid sub message !!! Please type Sub [topic_name] [subscriber_id]` |
+| Invalid publish | `Invalid pub message !!! Please type Pub [Topic_name][message_length]` |
+| Unknown command | `Invalid message.Choose Connect,Sub,Pub,Unsub !!!` |
 
-### Core Components
+Publishing to an unknown topic produces no wire response. Although the internal
+publisher returns `No topic found`, the parser does not send it to the client.
 
-- **Server**: Main server class that accepts client connections and manages the thread pool
-- **ProtocolParser**: Parses incoming client commands and validates protocol syntax
-- **Router**: Handles message routing between publishers and subscribers
-- **Topic**: Represents a message topic with its subscribers
-- **Subscriber**: Individual client subscription to a topic
-- **Publisher**: Handles message publishing to topics
-- **ThreadPool**: Manages worker threads for concurrent client handling
-- **Client**: Represents a connected client
+### Configuration and runtime
 
-### Thread Safety
+| Item | Current value |
+| --- | --- |
+| Main class | `com.jbroker.JbrokerApplication` |
+| Java version | 21 |
+| Worker threads | 4, not runtime configurable |
+| Parser task queue | 10, not runtime configurable |
+| State storage | In memory |
+| Default port | `4222` |
 
-The broker uses thread-safe collections (`ConcurrentHashMap`, `CopyOnWriteArrayList`) to handle concurrent access from multiple clients.
+### Main Java components
 
-## Testing
-
-Run the test suite:
-```bash
-mvn test
-```
-
-The project includes comprehensive test coverage:
-
-- **Unit Tests**: Testing individual components in isolation
-- **Integration Tests**: End-to-end testing of the protocol and client-server interactions
-  - `IntegrationTest.java` - Basic connection and command testing
-  - `PubIntegrationTest.java` - Message delivery, validation, and error handling
-  - `SubUnsubIntegration.java`- Integration testing for sub and unsub
-- **Property Testing**: Using jqwik for property-based testing to verify system behavior under various conditions
-
-### Test Coverage
-
-The integration tests verify:
-- Client connection establishment and validation
-- Topic subscription and unsubscription
-- Message publishing and delivery to multiple subscribers
-- Error handling for invalid commands and unknown topics
-- Protocol validation and response formatting
-- Concurrent client handling
-
-## Project Structure
-
-```
-src/
-├── main/java/com/jbroker/
-│   ├── Client.java              # Client connection representation
-│   ├── JbrokerApplication.java  # Main application entry point
-│   ├── Message.java             # Message representation
-│   ├── ProtocolParser.java      # Protocol parsing and validation
-│   ├── Publisher.java           # Message publishing logic
-│   ├── Router.java              # Message routing
-│   ├── Server.java              # Main server implementation
-│   ├── SendMessage.java         # Message sending functionality
-│   ├── Subscriber.java          # Subscription management
-│   ├── ThreadPool.java          # Thread pool management
-│   ├── Topic.java               # Topic representation
-│   └── Worker.java              # Worker thread implementation
-├── main/resources/
-│   └── application.properties   # Configuration file
-└── test/java/com/jbroker/       # Test classes
-    ├── IntegrationTest.java     # Basic connection and command testing
-    ├── PublishIntegrationTest.java  # Advanced publish-subscribe scenarios
-    ├── PubIntegrationTest.java      # Message delivery and validation testing
-    ├── SubUnsubIntegration.java     # Subscription/unsubscription testing
-    ├── Testbroker.java              # Additional broker testing
-    └── TestParser.java              # Protocol parser testing
-```
-
-## Development
-
-### Adding New Features
-
-1. Implement the feature in the appropriate component
-2. Add protocol command parsing in `ProtocolParser.java`
-3. Write tests for the new functionality
-4. Update this README if needed
-
-### Code Style
-
-The project follows standard Java conventions and uses:
-- Spring Boot for dependency management
-- JUnit 5 for testing
-- Mockito for mocking in tests
-- jqwik for property-based testing
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests for your changes
-5. Submit a pull request
-
-## License
-
-This project is currently unlicensed. Please add a LICENSE file if you plan to distribute or share this project.
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Port already in use**: Ensure the configured port (default 4222) is not being used by another application
-2. **Connection refused**: Verify the broker is running and accessible
-3. **Protocol errors**: Check command syntax matches the expected format
-
-### Debugging
-
-The broker includes logging that can help diagnose issues. Check the console output for error messages.
-
-## Future Enhancements
-
-Potential improvements that could be added:
-- Message persistence
-- Authentication and authorization
-- Message acknowledgments
-- Quality of Service (QoS) levels
-- Topic wildcards and patterns
-- Web interface for monitoring
-- Metrics and monitoring
-- Clustering support
-
-## Performance Considerations
-
-- The current implementation is designed for simplicity and educational purposes
-- For production use, consider adding connection limits, message size limits, and enhanced error handling
-- The thread pool size is configurable but may need tuning for high-load scenarios
+- `JbrokerApplication`: loads configuration and starts the server.
+- `Server`: accepts sockets and owns shared topics and subscription IDs.
+- `Parser`: validates and dispatches protocol lines for one connection.
+- `Subscriber`: creates subscriptions and removes subscriber IDs.
+- `Publisher`: finds an exact topic and fans out a message.
+- `Topic`: stores the topic name and client delivery list.
+- `Router`: writes newline-terminated messages to client sockets.
+- `ThreadPool` and `Worker`: process connection parser tasks.
+- `Client` and `Message`: carry connection and message state.
