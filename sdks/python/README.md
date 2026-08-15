@@ -44,7 +44,7 @@ Save this as `first_message.py` outside the SDK `src` directory:
 ```python
 import asyncio
 
-from jbroker_client import PyClient
+from PyJbroker import PyClient
 
 
 HOST = "127.0.0.1"
