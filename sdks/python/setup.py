@@ -2,13 +2,13 @@ from setuptools import setup
 
 setup(
     name="jbroker-client",
-    version="0.1.0",
+    version="0.1.1",
     description="Async Python client SDK for JBroker",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
     author="JBroker",
-    packages=["jbroker_client"],
-    package_dir={"jbroker_client": "src"},
+    packages=["PyJbroker"],
+    package_dir={"PyJbroker": "src"},
     python_requires=">=3.8",
     install_requires=[],
     classifiers=[
